@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Happy Birthday Alex! 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Sacramento&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A373;
+    --gold-light: #FAEDCD;
+    --cream: #FEFAE0;
+    --deep: #3D405B;
+    --rose: #E07A5F;
+    --rose-soft: #F2CC8F;
+    --sage: #81B29A;
+    --white: #FFFCF2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--deep);
+    color: var(--deep);
+    overflow-x: hidden;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── PRELOADER ── */
+  .preloader {
+    position: fixed; inset: 0;
+    background: var(--deep);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  .preloader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+  .preloader-text {
+    font-family: 'Sacramento', cursive;
+    font-size: 2.5rem;
+    color: var(--gold);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  /* ── CANVAS FOR CONFETTI ── */
+  #confetti-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* ── MAIN WRAPPER ── */
+  .card-wrapper {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── HERO SECTION ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    position: relative;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(212,163,115,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 80%, rgba(224,122,95,0.1) 0%, transparent 50%),
+      var(--cream);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, var(--gold) 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, var(--rose) 1px, transparent 1px),
+      radial-gradient(circle at 60% 70%, var(--sage) 1px, transparent 1px),
+      radial-gradient(circle at 10% 80%, var(--rose-soft) 1px, transparent 1px);
+    background-size: 120px 120px, 150px 150px, 100px 100px, 130px 130px;
+    opacity: 0.4;
+    animation: drift 20s linear infinite;
+  }
+
+  @keyframes drift {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-30px); }
+  }
+
+  .hero-content { position: relative; z-index: 2; }
+
+  .cake-emoji {
+    font-size: 4rem;
+    display: block;
+    animation: bounce 2s ease-in-out infinite;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 4px 12px rgba(212,163,115,0.3));
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-12px) scale(1.05); }
+  }
+
+  .hero-greeting {
+    font-family: 'Sacramento', cursive;
+    font-size: 3.2rem;
+    color: var(--rose);
+    line-height: 1.1;
+    margin-bottom: 0.3rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.5s;
+  }
+
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.8rem;
+    font-weight: 700;
+    color: var(--deep);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.8s;
+  }
+
+  .hero-name span {
+    color: var(--rose);
+    display: inline-block;
+    animation: wave 2.5s ease-in-out infinite 1.5s;
+  }
+
+  @keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    75% { transform: rotate(-5deg); }
+  }
+
+  .divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1s;
+  }
+
+  .hero-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--deep);
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1.2s;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.4rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 2s;
+  }
+
+  .scroll-hint span {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .scroll-arrow {
+    width: 20px; height: 20px;
+    border-right: 2px solid var(--gold);
+    border-bottom: 2px solid var(--gold);
+    transform: rotate(45deg);
+    animation: scrollBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollBounce {
+    0%, 100% { transform: rotate(45deg) translateY(0); opacity: 1; }
+    50% { transform: rotate(45deg) translateY(6px); opacity: 0.5; }
+  }
+
+  /* ── WISHES SECTION ── */
+  .wishes-section {
+    padding: 3rem 1.5rem;
+    background:
+      linear-gradient(180deg, var(--cream) 0%, var(--white) 30%, var(--cream) 100%);
+    position: relative;
+  }
+
+  .section-label {
+    font-family: 'Sacramento', cursive;
+    font-size: 2rem;
+    color: var(--rose);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .wish-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 1.8rem 1.5rem;
+    margin-bottom: 1.2rem;
+    box-shadow:
+      0 2px 20px rgba(61,64,91,0.04),
+      0 0 0 1px rgba(212,163,115,0.08);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .wish-card.visible { opacity: 1; transform: translateY(0); }
+
+  .wish-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .wish-card:nth-child(1)::before { background: var(--rose); }
+  .wish-card:nth-child(2)::before { background: var(--gold); }
+  .wish-card:nth-child(3)::before { background: var(--sage); }
+  .wish-card:nth-child(4)::before { background: var(--rose-soft); }
+  .wish-card:nth-child(5)::before { background: var(--rose); }
+
+  .wish-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+
+  .wish-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--deep);
+    margin-bottom: 0.5rem;
+  }
+
+  .wish-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: #5a5d78;
+  }
+
+  /* ── QUOTE SECTION ── */
+  .quote-section {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quote-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(212,163,115,0.08) 0%, transparent 60%);
+  }
+
+  .quote-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: -1rem;
+    display: block;
+    position: relative;
+  }
+
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--gold-light);
+    line-height: 1.7;
+    max-width: 320px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+  }
+
+  .quote-author {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    position: relative;
+  }
+
+  /* ── FINAL SECTION ── */
+  .final-section {
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(224,122,95,0.08) 0%, transparent 50%),
+      var(--cream);
+    position: relative;
+  }
+
+  .final-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.9; }
+  }
+
+  .final-message {
+    font-family: 'Sacramento', cursive;
+    font-size: 2.5rem;
+    color: var(--rose);
+    margin-bottom: 0.5rem;
+  }
+
+  .final-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--deep);
+    margin-bottom: 1.5rem;
+  }
+
+  .final-note {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: #5a5d78;
+    line-height: 1.7;
+    max-width: 300px;
+    margin: 0 auto 2rem;
+  }
+
+  .signature {
+    font-family: 'Sacramento', cursive;
+    font-size: 1.8rem;
+    color: var(--gold);
+  }
+
+  /* ── FLOATING ELEMENTS ── */
+  .floater {
+    position: absolute;
+    font-size: 1.4rem;
+    opacity: 0.15;
+    animation: float 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .floater:nth-child(1) { top: 15%; left: 8%; animation-delay: 0s; }
+  .floater:nth-child(2) { top: 40%; right: 5%; animation-delay: 1.5s; }
+  .floater:nth-child(3) { top: 65%; left: 12%; animation-delay: 3s; }
+  .floater:nth-child(4) { top: 85%; right: 10%; animation-delay: 4.5s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-15px) rotate(5deg); }
+    66% { transform: translateY(5px) rotate(-3deg); }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 360px) {
+    .hero-greeting { font-size: 2.6rem; }
+    .hero-name { font-size: 3rem; }
+    .wish-card { padding: 1.4rem 1.2rem; }
+  }
+
+  @media (min-width: 431px) {
+    .card-wrapper {
+      margin: 1rem auto;
+      border-radius: 24px;
+      min-height: calc(100vh - 2rem);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div class="preloader" id="preloader">
+  <span class="preloader-text">✨ Unwrapping your gift...</span>
+</div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confetti-canvas"></canvas>
+
+<div class="card-wrapper">
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="floater">🎈</div>
+    <div class="floater">✨</div>
+    <div class="floater">🎁</div>
+    <div class="floater">🌟</div>
+
+    <div class="hero-content">
+      <span class="cake-emoji">🎂</span>
+      <h1 class="hero-greeting">Happy Birthday</h1>
+      <h2 class="hero-name">Alex<span>!</span></h2>
+      <div class="divider"></div>
+      <p class="hero-subtitle">
+        Today is the most special day of the year —<br>
+        the day the world gained an incredible person.
+      </p>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll down</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- ── WISHES ── -->
+  <section class="wishes-section">
+    <h3 class="section-label">Wishes just for you</h3>
+
+    <div class="wish-card">
+      <span class="wish-icon">🌟</span>
+      <h4 class="wish-title">Health & Energy</h4>
+      <p class="wish-text">
+        Wishing you boundless health and positive energy. May every morning you wake up feel fresh, exciting, and full of inspiration to conquer extraordinary things.
+      </p>
+    </div>
+
+    <div class="wish-card">
+      <span class="wish-icon">🚀</span>
+      <h4 class="wish-title">Success & Breakthroughs</h4>
+      <p class="wish-text">
+        May every project and every dream of yours take flight. A new age, a new chapter — be bolder this year, because you deserve great things.
+      </p>
+    </div>
+
+    <div class="wish-card">
+      <span class="wish-icon">💛</span>
+      <h4 class="wish-title">Happiness & Love</h4>
+      <p class="wish-text">
+        May you always be surrounded by people who genuinely love you. Happiness isn't far away — it lives in the simple moments shared with the ones you hold dear.
+      </p>
+    </div>
+
+    <div class="wish-card">
+      <span class="wish-icon">🎯</span>
+      <h4 class="wish-title">Courage & Confidence</h4>
+      <p class="wish-text">
+        May you stand strong through every storm. Believe in yourself — you are stronger than you think, and you've already proven that more times than you know.
+      </p>
+    </div>
+
+    <div class="wish-card">
+      <span class="wish-icon">🌈</span>
+      <h4 class="wish-title">Joy & Surprises</h4>
+      <p class="wish-text">
+        May your life be filled with wonderful surprises. New adventures, new experiences, and countless unforgettable moments in the year ahead.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── QUOTE ── -->
+  <section class="quote-section">
+    <span class="quote-mark">"</span>
+    <p class="quote-text">
+      A new age isn't just another year gone by — it's a brand new chapter waiting for you to write.
+    </p>
+    <span class="quote-author">— For Alex —</span>
+  </section>
+
+  <!-- ── FINAL ── -->
+  <section class="final-section">
+    <span class="final-emoji">🥂</span>
+    <h3 class="final-message">Cheers to you,</h3>
+    <h2 class="final-name">Alex!</h2>
+    <p class="final-note">
+      Thank you for being such an amazing friend. Happy Birthday — today is your day, so enjoy every single moment of it!
+    </p>
+    <span class="signature">With love ♥</span>
+  </section>
+
+</div>
+
+<script>
+// ── Preloader ──
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('preloader').classList.add('hide');
+    launchConfetti();
+  }, 1200);
+});
+
+// ── Scroll reveal wish cards ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 120);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.wish-card').forEach(card => observer.observe(card));
+
+// ── Confetti ──
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#D4A373', '#E07A5F', '#81B29A', '#F2CC8F', '#3D405B', '#FAEDCD'];
+  const particles = [];
+  const TOTAL = 80;
+
+  for (let i = 0; i < TOTAL; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 6 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      speedY: Math.random() * 3 + 1.5,
+      speedX: (Math.random() - 0.5) * 2,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 8,
+      opacity: Math.random() * 0.5 + 0.5
+    });
+  }
+
+  let frame = 0;
+  const maxFrames = 300;
+
+  function animate() {
+    if (frame > maxFrames) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const fade = frame > maxFrames - 60 ? (maxFrames - frame) / 60 : 1;
+
+    particles.forEach(p => {
+      p.y += p.speedY;
+      p.x += p.speedX;
+      p.rotation += p.rotSpeed;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.globalAlpha = p.opacity * fade;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+
+      if (p.y > canvas.height + 20) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+
+    frame++;
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+}
+</script>
+</body>
+</html>
